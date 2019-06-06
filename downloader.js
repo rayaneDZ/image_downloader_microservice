@@ -22,27 +22,39 @@ const queryAndCheck = () => {
     let downloaded = 0;
     User.find()
     .then(users => {
+        //Iterate through users
         users.forEach(user => {
             const images_paths = user.images_paths
             const folder = user.username;
+            //Iterate through images_paths array of the user
             images_paths.forEach(image_path => {
                 const index = images_paths.indexOf(image_path).toString();
+                //Check if the file exists to avoid downloading the same file
                 if(fs.existsSync(`../${folder}/${index}.jpeg`)) {
                     console.log('file exists');
                 }else{
-                    toDownload+= 1;
+                    toDownload += 1;
                     download(image_path, folder,`${index}.jpeg`, () =>{
                         console.log('downloaded one image');
                         downloaded += 1;
                         if(toDownload === downloaded){
-                            console.log('finished downloading')
+                            postUpdate();
                         }
                     })
                 }
             })
         })
+    }).then(() => {
+        if(toDownload === 0){
+            postUpdate();
+        }
     })
 }
+
+const postUpdate = () => {
+    console.log('UPDATING FILES FINISHED !')
+}
+
 const download = (uri, folder, filename, callback) => {
     mkdirp(`../${folder}`, (err) => {
         if(err){
@@ -51,8 +63,6 @@ const download = (uri, folder, filename, callback) => {
     })
     request.head(uri, function(err, res, body){
         console.log('downloading one image .......')
-        console.log('content-type:', res.headers['content-type']);
-        console.log('content-length:', res.headers['content-length']);
         request(uri).pipe(fs.createWriteStream('../'+folder + '/' + filename)).on('close', callback);
     });
 };
