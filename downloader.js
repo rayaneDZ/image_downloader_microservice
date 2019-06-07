@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const User = require('./User.js');
 const cors = require('cors');
 const mkdirp = require ('mkdirp');
+const { exec } = require('child_process');
 const app = express();
 
 app.use(cors());
@@ -30,7 +31,7 @@ const queryAndCheck = () => {
             images_paths.forEach(image_path => {
                 const index = images_paths.indexOf(image_path).toString();
                 //Check if the file exists to avoid downloading the same file
-                if(fs.existsSync(`../${folder}/${index}.jpeg`)) {
+                if(fs.existsSync(`/home/pi/Desktop/face_ID/images/${folder}/${index}.jpeg`)) {
                     console.log('file exists');
                 }else{
                     toDownload += 1;
@@ -53,16 +54,26 @@ const queryAndCheck = () => {
 
 const postUpdate = () => {
     console.log('UPDATING FILES FINISHED !')
+    process.send({message : 'downloaded'});
+    exec('python /home/pi/Desktop/face_ID/training.py', (err, stdout, stderr) => {
+	if(err){
+	    console.err('second exec err : ', err)
+	}
+	if(stdout){
+	    process.send({message : 'trained'})
+	}
+	console.log('second stdour : ', stdout)
+    })
 }
 
 const download = (uri, folder, filename, callback) => {
-    mkdirp(`../${folder}`, (err) => {
+    mkdirp(`/home/pi/Desktop/face_ID/images/${folder}`, (err) => {
         if(err){
             console.log(err)
         }
     })
     request.head(uri, function(err, res, body){
         console.log('downloading one image .......')
-        request(uri).pipe(fs.createWriteStream('../'+folder + '/' + filename)).on('close', callback);
+        request(uri).pipe(fs.createWriteStream('/home/pi/Desktop/face_ID/images/'+folder + '/' + filename)).on('close', callback);
     });
 };
