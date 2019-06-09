@@ -57,7 +57,7 @@ const postUpdate = () => {
     process.send({message : 'downloaded'});
     exec('python /home/pi/Desktop/face_ID/training.py', (err, stdout, stderr) => {
 	if(err){
-	    console.err('second exec err : ', err)
+	    console.log('second exec err : ', err)
 	}
 	if(stdout){
 	    process.send({message : 'trained'})
