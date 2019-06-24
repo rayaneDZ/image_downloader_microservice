@@ -31,7 +31,7 @@ const queryAndCheck = () => {
             images_paths.forEach(image_path => {
                 const index = images_paths.indexOf(image_path).toString();
                 //Check if the file exists to avoid downloading the same file
-                if(fs.existsSync(`/home/pi/Desktop/face_ID/images/${folder}/${index}.jpeg`)) {
+                if(fs.existsSync(`/home/pi/Desktop/face_ID/${folder}/${index}.jpeg`)) {
                     console.log('file exists');
                 }else{
                     toDownload += 1;
@@ -62,7 +62,7 @@ const postUpdate = () => {
 	if(stdout){
 	    process.send({message : 'trained'})
 	}
-	console.log('second stdour : ', stdout)
+	console.log('downloader.js log - this is the stdout from training.py : ', stdout)
     })
 }
 
