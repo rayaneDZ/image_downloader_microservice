@@ -11,13 +11,20 @@ const app = express();
 
 app.use(cors());
 app.use(bodyParser.json());
+const recursive_connection = () => {
+    mongoose.connect('mongodb+srv://root:TqkFgJNZM7uN6En@face-identification-app-7h6js.mongodb.net/test?retryWrites=true&w=majority', {useNewUrlParser: true}, (err, db) =>{
+        if(mongoose.connection.readyState == 1){
+            console.log('CONNECTED TO DB')
+            queryAndCheck();
+        }else{
+	    console.log("COULD NOT CONNECT TO DB");
+	    recursive_connection();
+        }
+    });
+}
 
-mongoose.connect('mongodb+srv://root:TqkFgJNZM7uN6En@face-identification-app-7h6js.mongodb.net/test?retryWrites=true&w=majority', {useNewUrlParser: true}, (err, db) =>{
-    if(mongoose.connection.readyState == 1){
-        console.log('CONNECTED TO DB')
-        queryAndCheck();
-    }
-});
+recursive_connection();
+
 const queryAndCheck = () => {
     let toDownload = 0;
     let downloaded = 0;
